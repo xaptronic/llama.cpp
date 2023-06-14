@@ -295,20 +295,23 @@ int main(int argc, char ** argv) {
     fprintf(stderr, "generate: n_ctx = %d, n_batch = %d, n_predict = %d, n_keep = %d\n", n_ctx, params.n_batch, params.n_predict, params.n_keep);
     fprintf(stderr, "\n\n");
 
-    grammar_parser::parse_state parsed_grammar;
-    llama_grammar *             grammar = NULL;
-    if (!params.grammar.empty()) {
-        parsed_grammar = grammar_parser::parse(params.grammar.c_str());
-        // will be empty (default) if there are parse errors
-        if (parsed_grammar.out_grammar.empty()) {
-            return 1;
-        }
-        fprintf(stderr, "%s: grammar:\n", __func__);
-        grammar_parser::print_grammar(stderr, parsed_grammar);
-        fprintf(stderr, "\n");
-        grammar = llama_grammar_init(
-            parsed_grammar.out_grammar.data(), parsed_grammar.symbol_ids.at("root"));
-    }
+    grammar_parser::parse_state * parsed_grammar = llama_grammar_parse(params.grammar.c_str());
+    llama_grammar * grammar = llama_grammar_from_state(parsed_grammar);
+
+    // grammar_parser::parse_state parsed_grammar;
+    // llama_grammar *             grammar = NULL;
+    // if (!params.grammar.empty()) {
+    //     parsed_grammar = grammar_parser::parse(params.grammar.c_str());
+    //     // will be empty (default) if there are parse errors
+    //     if (parsed_grammar.out_grammar.empty()) {
+    //         return 1;
+    //     }
+    //     fprintf(stderr, "%s: grammar:\n", __func__);
+    //     grammar_parser::print_grammar(stderr, parsed_grammar);
+    //     fprintf(stderr, "\n");
+    //     grammar = llama_grammar_init(
+    //         parsed_grammar.out_grammar.data(), parsed_grammar.symbol_ids.at("root"));
+    // }
 
     // TODO: replace with ring-buffer
     std::vector<llama_token> last_n_tokens(n_ctx);
@@ -654,7 +657,7 @@ int main(int argc, char ** argv) {
                     if (grammar != NULL) {
                         llama_grammar_free(grammar);
                         grammar = llama_grammar_init(
-                            parsed_grammar.out_grammar.data(), parsed_grammar.symbol_ids.at("root"));
+                            parsed_grammar->out_grammar.data(), parsed_grammar->symbol_ids.at("root"));
                     }
                 }
                 is_interacting = false;

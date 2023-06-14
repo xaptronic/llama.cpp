@@ -2,6 +2,7 @@
 #define LLAMA_H
 
 #include "ggml.h"
+#include "grammar-parser.h"
 #ifdef GGML_USE_CUBLAS
 #include "ggml-cuda.h"
 #define LLAMA_MAX_DEVICES GGML_CUDA_MAX_DEVICES
@@ -264,7 +265,10 @@ extern "C" {
     //
     LLAMA_API struct llama_grammar * llama_grammar_init(const uint16_t * src, uint16_t start_rule_id);
     LLAMA_API void llama_grammar_free(struct llama_grammar * grammar);
-    LLAMA_API struct llama_grammar * llama_parse_grammar(const char * grammar_str);
+    // Grammar as string parsed into parse_state
+    LLAMA_API struct grammar_parser::parse_state * llama_grammar_parse(const char * grammar);
+    // Then init the grammar
+    LLAMA_API struct llama_grammar * llama_grammar_from_state(grammar_parser::parse_state * parsed_grammar);
 
     // Sampling functions
 

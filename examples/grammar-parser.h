@@ -21,6 +21,6 @@ namespace grammar_parser {
         std::vector<uint16_t>           out_grammar;
     };
 
-    parse_state parse(const char * src);
+    struct parse_state * parse(const char * src);
     void print_grammar(FILE * file, const parse_state & state);
 }

@@ -263,18 +263,18 @@ namespace grammar_parser {
         return parse_space(pos, true);
     }
 
-    parse_state parse(const char * src) {
+    struct parse_state * parse(const char * src) {
         try {
-            parse_state state;
+            parse_state * state = new parse_state();
             const char * pos = parse_space(src, true);
             while (*pos) {
-                pos = parse_rule(state, pos);
+                pos = parse_rule(*state, pos);
             }
-            state.out_grammar.push_back(0xffff);
+            state->out_grammar.push_back(0xffff);
             return state;
         } catch (const std::exception & err) {
             fprintf(stderr, "%s: error parsing grammar: %s\n", __func__, err.what());
-            return parse_state();
+            return new parse_state();
         }
     }
 
